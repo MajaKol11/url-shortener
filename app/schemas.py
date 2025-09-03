@@ -6,5 +6,5 @@ class ShortenRequest(BaseModel):
 
 class ShortenResponse(BaseModel):
     code: str
-    short_url: str
+    short_url: str      #relaxed to str to avoid localhost validation issues
     original_url: str
