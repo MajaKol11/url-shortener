@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException, Request, Response, status
 from fastapi.responses import RedirectResponse
 from urllib.parse import urlsplit, urlunsplit, urljoin
-from .schemas import ShortenRequest
+from .schemas import ShortenRequest, StatsResponse
 from .utils.codes import generate_code, RESERVED
 from .db import memory
 
@@ -92,3 +92,27 @@ def follow_short_code(code: str):
     
     memory.increment_hit_count(code)
     return RedirectResponse(url=rec["original_url"], status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+
+@app.get(
+    "/api/stats/{code}",
+    response_model=StatsResponse,
+    summary="Get stats for a short code"
+)
+def get_stats(code: str):
+    """
+    Return metadata for a short code:
+    - original_url
+    - created_at_utc
+    - hit_count
+    404 if the code doesn't exist
+    """
+    rec = memory.get_mapping(code)
+    if rec is None:
+        raise HTTPException(status_code=404, detail="Short code not found.")
+
+    return StatsResponse(
+        code=code,
+        original_url=rec["original_url"],
+        created_at_utc=rec["created_at_utc"],
+        hit_count=rec["hit_count"]
+    )
