@@ -1,5 +1,6 @@
 from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException, Request, Response, status
+from fastapi.responses import RedirectResponse
 from urllib.parse import urlsplit, urlunsplit, urljoin
 from .schemas import ShortenRequest
 from .utils.codes import generate_code, RESERVED
@@ -59,9 +60,9 @@ def create_short_url(payload: ShortenRequest, request: Request, response: Respon
     existing_code = memory.get_code_by_url(normalized)
     if existing_code:
         code = existing_code
-    else: 
+    else:
         #Generate unique, non-reserved code
-        while True: 
+        while True:
             code = generate_code(8)
             if code in RESERVED:
                 continue
