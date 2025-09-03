@@ -1,7 +1,7 @@
-from typing import Dict, Optional, TypeDict
+from typing import Dict, Optional, TypedDict
 from datetime import datetime, timezone
 
-class UrlRecord(TypeDict):
+class UrlRecord(TypedDict):
     original_url: str
     normalized_url: str
     created_at_utc: str

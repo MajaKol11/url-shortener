@@ -1,6 +1,9 @@
 from datetime import datetime, timezone
-from fastapi import FastAPI
-from urllib.parse import urlsplit, urlunsplit
+from fastapi import FastAPI, HTTPException, Request, Response, status
+from urllib.parse import urlsplit, urlunsplit, urljoin
+from .schemas import ShortenRequest
+from .utils.codes import generate_code, RESERVED
+from .db import memory
 
 app = FastAPI(title="URL Shortener", version="0.1.0")
 
@@ -28,10 +31,45 @@ def _normalize_url(url: str) -> str:
     parts = urlsplit(s)
 
     scheme = parts.scheme.lower()
-    netloc = parts.netlock.lower()
+    netloc = parts.netloc.lower()
 
     if scheme not in ("http", "https") or not netloc:
         raise ValueError("Only absolute HTTP/HTTPS URLs are allowed.")
     
     #Rebuild, preserving path/query/fragment as-is
     return urlunsplit((scheme, netloc, parts.path, parts.query, parts.fragment))
+
+
+@app.post(
+    "/api/shorten",
+    status_code=status.HTTP_201_CREATED,
+    summary="Create a shortened URL",
+)
+def create_short_url(payload: ShortenRequest, request: Request, response: Response):
+    original_url = str(payload.url)
+
+    if len(original_url) > 2048:
+        raise HTTPException(status_code=400, detail="URL is too long (max 2048 characters).")
+    
+    try:
+        normalized = _normalize_url(original_url)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+    existing_code = memory.get_code_by_url(normalized)
+    if existing_code:
+        code = existing_code
+    else: 
+        #Generate unique, non-reserved code
+        while True: 
+            code = generate_code(8)
+            if code in RESERVED:
+                continue
+            if memory.get_mapping(code) is None:
+                break
+        memory.save_mapping(code, original_url=original_url, normalized_url=normalized)
+
+    short_url = urljoin(str(request.base_url), code)
+
+    response.headers["Location"] = short_url
+    return {"short_url": short_url, "code": code, "original_url": original_url}
