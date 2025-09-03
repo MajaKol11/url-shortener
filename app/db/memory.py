@@ -28,3 +28,11 @@ def save_mapping(code: str, original_url: str, normalized_url: str) -> UrlRecord
     code_to_url[code] = rec
     url_to_code[normalized_url] = code
     return rec
+
+def increment_hit_count(code: str) -> Optional[UrlRecord]:
+    """Increase hit_count for a code; return the updated record or None if missing."""
+    rec = code_to_url.get(code)
+    if rec is None:
+        return None
+    rec["hit_count"] += 1
+    return rec
