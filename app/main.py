@@ -73,3 +73,21 @@ def create_short_url(payload: ShortenRequest, request: Request, response: Respon
 
     response.headers["Location"] = short_url
     return {"short_url": short_url, "code": code, "original_url": original_url}
+
+
+@app.get(
+    "/{code}",
+    include_in_schema=False,
+    summary="Follow a shortened code"
+)
+def follow_short_code(code: str):
+    """
+    Look up the short code, increment its hit counter, and redirect to the original URL. 
+    Returns 404 if the code doesn't exist.
+    """
+    rec=memory.get_mapping(code)
+    if rec is None: 
+        raise HTTPException(status_code=404, detail="Short code not found.")
+    
+    memory.increment_hit_count(code)
+    return RedirectResponse(url=rec["original_url"], status_code=status.HTTP_307_TEMPORARY_REDIRECT)
