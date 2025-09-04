@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>URL Shortener</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    body { margin: 2rem; max-width: 760px; }
+    h1 { font-size: 1.5rem; margin-bottom: 0.75rem; }
+    form { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    input[type="url"] { flex: 1 1 420px; padding: 0.6rem; border: 1px solid #ccc; border-radius: 8px; }
+    button { padding: 0.6rem 1rem; border: 1px solid #ccc; border-radius: 8px; background: #f6f6f6; cursor: pointer; }
+    button:hover { background: #eee; }
+    .row { display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap; }
+    .code { font-weight: 600; }
+    .error { color: #b00020; margin-top: 0.75rem; }
+    .muted { color: #666; font-size: 0.9rem; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <h1>URL Shortener</h1>
+  <p class="muted">Paste a full <code>http</code>/<code>https</code> URL. We’ll return a short link you can share.</p>
+
+  <form id="shorten-form" autocomplete="off">
+    <input id="url-input" type="url" placeholder="https://example.com/page?q=1#top" required />
+    <button id="shorten-btn" type="submit">Shorten</button>
+  </form>
+
+  <p id="error" class="error hidden" role="alert"></p>
+
+  <div id="result" class="row hidden" aria-live="polite">
+    <a id="short-link" href="#" target="_blank" rel="noopener noreferrer"></a>
+    <button id="copy-btn" type="button">Copy</button>
+    <span id="copied" class="muted hidden">Copied ✓</span>
+  </div>
+
+  <div id="stats" class="row hidden">
+    <span class="muted">Hits:</span>
+    <span id="hits" class="code">0</span>
+  </div>
+
+  <script>
+    const $ = (sel) => document.querySelector(sel);
+    const form = $("#shorten-form");
+    const input = $("#url-input");
+    const errorEl = $("#error");
+    const resultRow = $("#result");
+    const statsRow = $("#stats");
+    const linkEl = $("#short-link");
+    const copyBtn = $("#copy-btn");
+    const copiedEl = $("#copied");
+    const hitsEl = $("#hits");
+
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.classList.remove("hidden");
+    }
+    function clearError() {
+      errorEl.textContent = "";
+      errorEl.classList.add("hidden");
+    }
+    function showResult(shortUrl) {
+      linkEl.textContent = shortUrl;
+      linkEl.href = shortUrl;
+      resultRow.classList.remove("hidden");
+    }
+    function showHits(n) {
+      hitsEl.textContent = n;
+      statsRow.classList.remove("hidden");
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearError();
+      copiedEl.classList.add("hidden");
+
+      const url = (input.value || "").trim();
+      if (!url) { showError("Please enter a URL."); return; }
+
+      try {
+        const resp = await fetch("/api/shorten", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          const msg = data?.detail || `Error ${resp.status}`;
+          throw new Error(msg);
+        }
+        showResult(data.short_url);
+
+        // Optional: fetch initial stats
+        try {
+          const statsResp = await fetch(`/api/stats/${encodeURIComponent(data.code)}`);
+          if (statsResp.ok) {
+            const stats = await statsResp.json();
+            showHits(stats.hit_count ?? 0);
+          }
+        } catch { /* fine to ignore */ }
+
+      } catch (err) {
+        showError(err.message || "Something went wrong.");
+      }
+    });
+
+    copyBtn.addEventListener("click", async () => {
+      const text = linkEl.href;
+      if (!text) return;
+      try {
+        await navigator.clipboard.writeText(text);
+        copiedEl.classList.remove("hidden");
+        setTimeout(() => copiedEl.classList.add("hidden"), 1500);
+      } catch {
+        showError("Copy failed. You can copy the link manually.");
+      }
+    });
+  </script>
+</body>
+</html>
