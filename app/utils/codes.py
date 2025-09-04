@@ -4,7 +4,7 @@ import secrets
 ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 #Avoid collisions with routes/docs
-RESERVED = {"", "api", "docs", "openapi.json", "redoc", "health"}
+RESERVED = {"", "api", "docs", "openapi.json", "redoc", "health", "static", "favicon.ico"}
 
 def generate_code(length: int = 8) -> str:
     """Cryptographically strong random short code."""
