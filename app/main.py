@@ -1,12 +1,14 @@
 from datetime import datetime, timezone
 from fastapi import FastAPI, HTTPException, Request, Response, status
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, FileResponse
 from urllib.parse import urlsplit, urlunsplit, urljoin
 from .schemas import ShortenRequest, StatsResponse
 from .utils.codes import generate_code, RESERVED
 from .db import memory
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title="URL Shortener", version="0.1.0")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/health", summary="Liveness/health check")
 def health():
@@ -16,10 +18,8 @@ def health():
     }
 
 @app.get("/", include_in_schema=False)
-def root():
-    return {
-        "message": "URL Shortener API. See /docs for interactive API."
-    }
+def landing_page():
+    return FileResponse("static/index.html")
 
 def _normalize_url(url: str) -> str:
     """
