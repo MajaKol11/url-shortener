@@ -39,3 +39,16 @@ static/
 .gitignore
 README.md
 requirements.txt
+
+## Prerequisites
+- **Python** 3.10+ and **pip**
+- (Optional) **VS Code** with the **Python** extension
+- This repo’s `requirements.txt` (FastAPI, Uvicorn, etc.)
+
+---
+
+## Setup
+1) **Clone & open** the repo in your editor.  
+2) **Create a virtual environment**:
+   ```bash
+   python -m venv .venv
