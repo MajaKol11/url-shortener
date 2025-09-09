@@ -39,6 +39,7 @@ static/
 .gitignore
 README.md
 requirements.txt
+```
 
 ## Prerequisites
 - **Python** 3.10+ and **pip**
@@ -52,3 +53,9 @@ requirements.txt
 2) **Create a virtual environment**:
    ```bash
    python -m venv .venv
+   ```
+3) **Activate the virtual environment**:
+    a) **Windows**
+        ```bash
+        .venv\Scripts\activate
+        ```
