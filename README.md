@@ -82,11 +82,11 @@ requirements.txt
 - **Note**: This build uses in-memory storage. All data resets when the server restarts.
 
 ## Usage
-**UI**
+### UI
 1) Visit `/` 
 2) Paste a full http or https URL
 3) Click Shorten - copy or open the returned short link
-**API**
+### API
 - Create a short link
 ```bash
   curl -X POST http://127.0.0.1:8000/api/shorten \
@@ -133,12 +133,12 @@ requirements.txt
 
  ## Common Tasks
  - **Change server port (e.g 9000)**
- - ```bash
-   uvicorn app.main:app --reload --port 9000
-   ```
+ ```bash
+  uvicorn app.main:app --reload --port 9000
+```
 - **Run without reload**
-- ```bash
+```bash
   uvicorn app.main:app
-  ```
+```
 
 
