@@ -17,6 +17,9 @@ Paste a long link and get a short one you can share. Includes a tiny UI, redirec
 - Input validation and duplicate detection (same long URL → same code)
 - In-memory storage for now (simple and fast for local dev)
 
+### Reserved paths (not used as codes)
+`api`, `docs`, `openapi.json`, `redoc`, `health`, `static`, `favicon.ico`
+
 ## Tech Stack
 - Python, FastAPI, Uvicorn
 - HTML/CSS/vanilla JS (static page)
