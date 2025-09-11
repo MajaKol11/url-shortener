@@ -119,9 +119,11 @@ requirements.txt
  - Ensure the body is valid JSON: `{"url":"https://..."}`
  - Only **absolute** `http` / `https` URLs are allowed
  - Max URL length: 2048 characters
+ -
  **404 on `/api/stats/{code}` or  `/{code}`:**
  - The code doesn't exist (create it first via `POST /api/shorten`)
  - Remember: in-memory store clears on server restart
+ -
  **Nothing happens on `/`:**
  - Check the server logs for errors
  - Ensure `static/index.html` exists and the app is serving it at `/`.
