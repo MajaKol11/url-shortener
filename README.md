@@ -79,20 +79,17 @@ requirements.txt
 - **Note**: This build uss in-memory storage. All date resets when the server restarts.
 
 ## Usage
-- **UI**
- - 1) Visit 
-    ```bash
-    /
-    ```
-- 2) Paste a full http or https URL
-- 3) Click Shorten - copy or open the returned short link
-- **API**
+**UI**
+1) Visit `/` 
+2) Paste a full http or https URL
+3) Click Shorten - copy or open the returned short link
+**API**
 - Create a short link
-- ```bash
+```bash
     curl -X POST http://127.0.0.1:8000/api/shorten \
      -H "Content-Type: application/json" \
      -d '{"url":"https://example.com/docs?q=1#top"}'
-  ```
+```
 - Response (example)
 - ```json
     {
