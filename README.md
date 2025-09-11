@@ -70,13 +70,13 @@ requirements.txt
 
 ## Run Locally 
 - Start the server (auto reloads on code changes): 
-- ```bash
-    uvicorn app.main:app --reload
-    ```
+ ```bash
+  uvicorn app.main:app --reload
+  ```
 - Open http://127.0.0.1:8000 for the UI.
 - Open http://127.0.0.1:8000/docs for the interactive API docs (Swagger UI)
 - Health check: http://127.0.0.1:8000/health
-- **Note**: This build uss in-memory storage. All date resets when the server restarts.
+- **Note**: This build uses in-memory storage. All data resets when the server restarts.
 
 ## Usage
 **UI**
@@ -86,43 +86,43 @@ requirements.txt
 **API**
 - Create a short link
 ```bash
-    curl -X POST http://127.0.0.1:8000/api/shorten \
-     -H "Content-Type: application/json" \
-     -d '{"url":"https://example.com/docs?q=1#top"}'
+  curl -X POST http://127.0.0.1:8000/api/shorten \
+    -H "Content-Type: application/json" \
+    -d '{"url":"https://example.com/docs?q=1#top"}'
 ```
 - Response (example)
-- ```json
-    {
-    "code": "A1b2C3d4",
-    "short_url": "http://127.0.0.1:8000/A1b2C3d4",
-    "original_url": "https://example.com/docs?q=1#top"
-    }
-  ```
+```json
+  {
+  "code": "A1b2C3d4",
+  "short_url": "http://127.0.0.1:8000/A1b2C3d4",
+  "original_url": "https://example.com/docs?q=1#top"
+  }
+```
 - Follow a short link
-- `http://127.0.0.1:8000/A1b2C3d4`
+ `http://127.0.0.1:8000/A1b2C3d4`
 - Get stats for a code
-- ```bash
-    curl http://127.0.0.1:8000/api/stats/A1b2C3d4
-  ```
+```bash
+ curl http://127.0.0.1:8000/api/stats/A1b2C3d4
+ ```
 - Response (example)
-- ```json
-    {
-    "code": "A1b2C3d4",
-    "original_url": "https://example.com/docs?q=1#top",
-    "created_at_utc": "2025-09-09T12:00:00.000000+00:00",
-    "hit_count": 3
-    }
-  ```
+```json
+  {
+  "code": "A1b2C3d4",
+  "original_url": "https://example.com/docs?q=1#top",
+  "created_at_utc": "2025-09-09T12:00:00.000000+00:00",
+  "hit_count": 3
+  }
+```
  
  ## Troubleshooting
- 1) **422 or 400 errors when shortening:**
+ **422 or 400 errors when shortening:**
  - Ensure the body is valid JSON: `{"url":"https://..."}`
  - Only **absolute** `http` / `https` URLs are allowed
  - Max URL length: 2048 characters
- 2) **404 on `/api/stats/{code}` or  `/{code}`:**
+ **404 on `/api/stats/{code}` or  `/{code}`:**
  - The code doesn't exist (create it first via `POST /api/shorten`)
  - Remember: in-memory store clears on server restart
- 3) **Nothing happens on `/`:**
+ **Nothing happens on `/`:**
  - Check the server logs for errors
  - Ensure `static/index.html` exists and the app is serving it at `/`.
 
